@@ -1,0 +1,16 @@
+# any images
+*.JPG
+*.png
+*.gif
+
+# data files (for now)
+/data*/
+
+# pip
+get-pip.py
+
+# Cifar10 NN tutorial
+/models/
+
+# virtual environment directory (requirements are in requirements.txt)
+/venv/
