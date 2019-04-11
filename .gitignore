@@ -1,5 +1,9 @@
-# any images
+# any media(images, video)
+*.avi
+*.mov
+*.mp4
 *.JPG
+*.jpg
 *.png
 *.gif
 
