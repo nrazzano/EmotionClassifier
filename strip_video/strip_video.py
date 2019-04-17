@@ -12,11 +12,18 @@ def main() :
 	print('Starting...')
 	
 	haar_cascade_face = cv2.CascadeClassifier('/home/nick/Documents/EmotionClassifier/data/haarcascade_frontalface_default.xml')
-
 	input_file = sys.argv[1]
+	if not (os.path.exists(input_file)):
+		print(input_file + ' DOES NOT EXIST!!!')
+		return 0
+
 	input_filename = input_file[input_file.rfind('/')+1:input_file.rfind('.')]
-	#output_path = '/home/nick/Documents/EmotionClassifier/strip_video/images/'
-	output_path = os.getcwd()
+	output_path = os.path.join(os.getcwd(), sys.argv[2])
+	if not (os.path.isdir(output_path)):
+		print(output_path + ' DOES NOT EXIST!!!')
+		return 0
+	
+	#output_path = os.getcwd()
 	print('writing images to: ' + output_path)
 	index = 0
 	cap = cv2.VideoCapture(sys.argv[1])
@@ -32,7 +39,7 @@ def main() :
 		#print(output_full_path)
 		cv2.imwrite(output_path + '/'+ output_file, img_roi) 
 		index += 1
-	
+
 	print("done")
 
 
@@ -70,7 +77,7 @@ def detect_faces(cascade, img_input, scale_factor = 1.1):
 
 	img_gray = convert_to_gray(img_input)
 	faces_rects = cascade.detectMultiScale(img_gray, scaleFactor = 1.2, minNeighbors = 5)
-	return draw_face_rect(faces_rects, img_input)
+	return draw_face_rect(faces_rects, img_gray)
 	#print('Faces found: ', len(faces_rects))
 
 
