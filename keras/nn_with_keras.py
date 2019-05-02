@@ -4,23 +4,22 @@
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Conv2D, MaxPooling2D, Flatten, Dropout
+from keras.optimizers import Adamax
 
 
-print("hello")
+'''
+def get_pixels(in_pixels):
+	img_size=48
+'''
 
 
-model = Sequential([
-    Dense(32, input_shape=(784,)),
-    Activation('relu'),
-    Dense(10),
-    Activation('softmax'),
-])
 
+'''
 # initialize the convolutional neural net
 classifier = Sequential()
 
 # add layers; Convolution, pooling, flattening respectively
-classifier.add(Conv2D(32, (3, 3), input_shape = (150, 150, 3), activation = 'relu'))
+classifier.add(Conv2D(32, (3, 3), input_shape = (48, 48, 3), activation = 'relu'))
 classifier.add(MaxPooling2D(pool_size = (2, 2)))
 classifier.add(Flatten())
 
@@ -28,11 +27,32 @@ classifier.add(Flatten())
 # so we can find the probability of the emotion being neutral or not
 classifier.add(Dense(activation = 'relu', units=128))
 classifier.add(Dense(activation = 'sigmoid', units=1))
+'''
 
-classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+classifier=Sequential()
+classifier.add(Conv2D(32, (3, 3), input_shape = (48, 48, 3), activation = 'relu'))
+classifier.add(MaxPooling2D(pool_size = (2, 2)))
+classifier.add(Flatten())
+classifier.add(Dense(activation='relu', units=128))
+#classifier.add(Dense(256, input_shape=(256,), activation='relu'))
+classifier.add(Dropout(0.5))
+classifier.add(Dense(128, input_shape=(256,)))
+classifier.add(Dense(7, activation='softmax'))
+
+adamax = Adamax()
+
+classifier.compile(loss = 'categorical_crossentropy',
+					optimizer=adamax, metrics = ['accuracy'])
 
 # Fit the CNN to the images
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+
+#pixel_arr=get_pixels(raw_data[['pixels']])
+
+
+
+
+
 
 train_datagen = ImageDataGenerator(
 		rescale = 1./255,
@@ -55,29 +75,30 @@ train_datagen = ImageDataGenerator(
 test_datagen = ImageDataGenerator(rescale = 1./255)
 #print('\n\nSomethingi1\n\n')
 training_set = train_datagen.flow_from_directory(
-		'dataset/train1',
-		target_size = (150, 150),
-		batch_size = 16,
-		class_mode = 'binary')
+		'dataset/Training',
+		target_size = (48, 48),
+		batch_size = 32,
+		class_mode = 'categorical')
 
 #print('\n\nSomething2\n\n')
 test_set = test_datagen.flow_from_directory(
-		'dataset/test1',
-		target_size = (150, 150),
-		batch_size = 16,
-		class_mode = 'binary')
+		'dataset/PrivateTest',
+		target_size = (48, 48),
+		batch_size = 32,
+		class_mode = 'categorical')
 
-#print('\n\nSomething3\n\n')
 
 #from IPython.display import display
 #from PIL import Image
 
+
 classifier.fit_generator(
 		training_set,
 		steps_per_epoch = 8000,
-		epochs = 1,
+		epochs = 10,
 		validation_data=test_set,
 		validation_steps = 800)
 
-classifier.save_weights('second_try_1epoch.h5')
+classifier.save_weights('weights_5_100epoch.h5')
+classifier.save('classifier_model_5_100epoch.h5')
 
